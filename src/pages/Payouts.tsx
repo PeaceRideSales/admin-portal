@@ -4,9 +4,8 @@ import StatCard from '../components/StatCard'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-function AgentPayoutRow({ agent, globalPrice, onPriceChange }: {
+function AgentPayoutRow({ agent, onPriceChange }: {
   agent: any
-  globalPrice: number
   onPriceChange: (id: string, price: number | null) => void
 }) {
   const [editing, setEditing] = useState(false)
@@ -55,7 +54,7 @@ function AgentPayoutRow({ agent, globalPrice, onPriceChange }: {
                 {agent.has_custom_price ? (
                   <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-semibold">${agent.price_per_driver}/driver</span>
                 ) : (
-                  <span className="text-slate-400">global (${globalPrice})</span>
+                  <span className="text-slate-400">Tiered (120-150 Birr)</span>
                 )}
               </span>
               <button onClick={() => { setPriceInput(String(agent.price_per_driver)); setEditing(true) }}
@@ -102,8 +101,6 @@ export default function Payouts() {
 
   if (loading) return <div className="flex items-center justify-center h-48"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
 
-  const globalPrice = summary?.global_price || 0
-
   return (
     <div className="space-y-6">
       <div>
@@ -117,7 +114,7 @@ export default function Payouts() {
           icon={<DollarSign className="w-5 h-5" />} color="emerald" />
         <StatCard label="Verified Drivers" value={summary?.total_verified_drivers || 0}
           icon={<TrendingUp className="w-5 h-5" />} color="blue" />
-        <StatCard label="Global Price/Driver" value={`$${globalPrice.toFixed(2)}`}
+        <StatCard label="Tiered Pricing" value="120-150 Birr"
           icon={<Users className="w-5 h-5" />} color="indigo" />
       </div>
 
@@ -129,7 +126,7 @@ export default function Payouts() {
         </div>
         <div>
           {(summary?.agents || []).map((agent: any) => (
-            <AgentPayoutRow key={agent.id} agent={agent} globalPrice={globalPrice} onPriceChange={handlePriceChange} />
+            <AgentPayoutRow key={agent.id} agent={agent} onPriceChange={handlePriceChange} />
           ))}
           {(!summary?.agents?.length) && (
             <div className="p-10 text-center text-slate-400">No approved agents yet.</div>

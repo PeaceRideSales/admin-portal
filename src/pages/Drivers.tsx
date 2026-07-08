@@ -111,6 +111,13 @@ export default function Drivers() {
                       <div className="text-xs text-slate-400 mt-1 flex items-center gap-3">
                         <span className="flex items-center gap-1"><Car className="w-3 h-3" />{driver.car_model}</span>
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{driver.location || 'Unknown'}</span>
+                        {driver.vehicle_category && (
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                            driver.vehicle_category === 'LATEST_OR_EV' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-500'
+                          }`}>
+                            {driver.vehicle_category === 'LATEST_OR_EV' ? 'Latest / EV' : 'Older'}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <Eye className="w-4 h-4 text-slate-300 group-hover:text-blue-500 shrink-0 ml-4" />
