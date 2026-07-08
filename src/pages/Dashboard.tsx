@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
-import { Users, Car, TrendingUp, AlertCircle } from 'lucide-react'
+import { Users, Car, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon } from 'lucide-react'
 import StatCard from '../components/StatCard'
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, Legend,
+  PieChart, Pie, Cell
+} from 'recharts'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>({})
   const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [chartData, setChartData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => { fetchStats() }, [])
@@ -15,14 +21,23 @@ export default function Dashboard() {
     const token = localStorage.getItem('admin_token')
     const headers = { Authorization: `Bearer ${token}` }
     try {
-      const [statsRes, leadRes] = await Promise.all([
+      const [statsRes, leadRes, chartsRes] = await Promise.all([
         fetch(`${API}/stats`, { headers }),
-        fetch(`${API}/stats/leaderboard`, { headers })
+        fetch(`${API}/stats/leaderboard`, { headers }),
+        fetch(`${API}/stats/charts`, { headers })
       ])
       setStats(statsRes.ok ? await statsRes.json() : {})
+      
       const ld = leadRes.ok ? await leadRes.json() : []
       setLeaderboard(Array.isArray(ld) ? ld : [])
-    } catch { setStats({}); setLeaderboard([]) }
+
+      if (chartsRes.ok) {
+        setChartData(await chartsRes.json())
+      }
+    } catch { 
+      setStats({}); 
+      setLeaderboard([]);
+    }
     finally { setLoading(false) }
   }
 
@@ -46,6 +61,81 @@ export default function Dashboard() {
         <StatCard label="Active Agents"      value={stats.total_agents}       icon={<Users className="w-5 h-5" />}         color="indigo" />
         <StatCard label="Pending Approval"   value={stats.pending_agents}     icon={<AlertCircle className="w-5 h-5" />}   color="amber" />
       </div>
+
+      {/* Analytics Charts */}
+      {chartData && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {/* Trend Chart */}
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 xl:col-span-2">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-blue-600" /> Registrations (Last 30 Days)
+            </h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData.trend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="date" tick={{fontSize: 12, fill: '#64748b'}} tickFormatter={(v) => v.substring(5)} tickLine={false} axisLine={false} />
+                  <YAxis tick={{fontSize: 12, fill: '#64748b'}} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                  <Area type="monotone" dataKey="count" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Car Types Chart */}
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <PieChartIcon className="w-5 h-5 text-indigo-600" /> Car Types
+            </h3>
+            <div className="h-64 flex flex-col">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData.carTypes}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {chartData.carTypes.map((_: any, index: number) => (
+                      <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#64748b'][index % 6]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                  <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Locations Bar Chart */}
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 xl:col-span-3">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-emerald-600" /> Top Locations
+            </h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData.locations.slice(0, 10)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                  <XAxis type="number" tick={{fontSize: 12, fill: '#64748b'}} tickLine={false} axisLine={false} />
+                  <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12, fill: '#64748b'}} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} cursor={{fill: '#f1f5f9'}} />
+                  <Bar dataKey="count" fill="#10b981" radius={[0, 4, 4, 0]} barSize={24} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
