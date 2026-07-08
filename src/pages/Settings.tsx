@@ -5,6 +5,7 @@ const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 export default function Settings() {
   const [price, setPrice] = useState<string>('0')
+  const [googleSheetId, setGoogleSheetId] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -21,6 +22,7 @@ export default function Settings() {
       if (res.ok) {
         const data = await res.json()
         setPrice(String(data.driver_registration_price ?? 0))
+        setGoogleSheetId(data.google_sheet_id || '')
       }
     } catch { setError('Failed to load settings') }
     finally { setLoading(false) }
@@ -36,7 +38,10 @@ export default function Settings() {
       const res = await fetch(`${API}/settings`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ driver_registration_price: parseFloat(price) || 0 })
+        body: JSON.stringify({ 
+          driver_registration_price: parseFloat(price) || 0,
+          google_sheet_id: googleSheetId
+        })
       })
       if (!res.ok) throw new Error('Failed to save')
       setSaved(true)
@@ -108,6 +113,22 @@ export default function Settings() {
             <p className="text-xs text-blue-600 mt-1">
               An agent with 10 drivers will earn:{' '}
               <span className="font-bold">${(parseFloat(price || '0') * 10).toFixed(2)}</span>
+            </p>
+          </div>
+
+          <div className="pt-4 border-t border-slate-200">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+              Google Sheet ID (For Export Sync)
+            </label>
+            <input
+              type="text"
+              value={googleSheetId}
+              onChange={e => setGoogleSheetId(e.target.value)}
+              className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="e.g. 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+            />
+            <p className="text-xs text-slate-500 mt-2">
+              The ID is found in your Google Sheets URL between <code>/d/</code> and <code>/edit</code>. Make sure the sheet is shared with the Service Account email.
             </p>
           </div>
 

@@ -7,6 +7,7 @@ export default function Reports() {
   const [agents, setAgents] = useState<any[]>([])
   const [selectedAgent, setSelectedAgent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
     fetchAgents()
@@ -26,6 +27,29 @@ export default function Reports() {
 
   function handleExportAll() {
     exportData(`${API}/export/all`, `peace-ride-all-drivers-${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  async function handleSyncGoogleSheets() {
+    if (!confirm('This will overwrite the target Google Sheet with the latest driver data. Make sure your Google Sheet ID is saved in Settings. Continue?')) {
+      return
+    }
+    setSyncing(true)
+    const token = localStorage.getItem('admin_token')
+    try {
+      const res = await fetch(`${API}/export/google-sheets`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.message || 'Sync failed')
+      }
+      alert(data.message || 'Successfully synced to Google Sheets!')
+    } catch (err: any) {
+      alert(err.message)
+    } finally {
+      setSyncing(false)
+    }
   }
 
   function handleExportAgent() {
@@ -77,13 +101,22 @@ export default function Reports() {
             <p className="text-sm text-slate-500 mt-1 mb-4">
               Download a complete Excel spreadsheet containing all drivers registered by all agents.
             </p>
-            <button
-              onClick={handleExportAll}
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors disabled:bg-slate-300"
-            >
-              {loading ? 'Generating...' : 'Download Global Export'}
-            </button>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={handleExportAll}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors disabled:bg-slate-300"
+              >
+                {loading ? 'Generating...' : 'Download Global Export'}
+              </button>
+              <button
+                onClick={handleSyncGoogleSheets}
+                disabled={syncing}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors disabled:bg-slate-300"
+              >
+                {syncing ? 'Syncing...' : 'Sync to Google Sheets'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
