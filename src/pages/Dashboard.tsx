@@ -1,45 +1,33 @@
-import { useState, useEffect } from 'react'
 import { Users, Car, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import StatCard from '../components/StatCard'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Legend,
   PieChart, Pie, Cell
 } from 'recharts'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+import { api } from '../api'
 
 export default function Dashboard() {
-  const [stats, setStats] = useState<any>({})
-  const [leaderboard, setLeaderboard] = useState<any[]>([])
-  const [chartData, setChartData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => { fetchStats() }, [])
-
-  async function fetchStats() {
-    const token = localStorage.getItem('admin_token')
-    const headers = { Authorization: `Bearer ${token}` }
-    try {
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['dashboard_stats'],
+    queryFn: async () => {
       const [statsRes, leadRes, chartsRes] = await Promise.all([
-        fetch(`${API}/stats`, { headers }),
-        fetch(`${API}/stats/leaderboard`, { headers }),
-        fetch(`${API}/stats/charts`, { headers })
+        api.get('/stats'),
+        api.get('/stats/leaderboard'),
+        api.get('/stats/charts').catch(() => null)
       ])
-      setStats(statsRes.ok ? await statsRes.json() : {})
-      
-      const ld = leadRes.ok ? await leadRes.json() : []
-      setLeaderboard(Array.isArray(ld) ? ld : [])
-
-      if (chartsRes.ok) {
-        setChartData(await chartsRes.json())
+      return {
+        stats: statsRes || {},
+        leaderboard: Array.isArray(leadRes) ? leadRes : [],
+        chartData: chartsRes
       }
-    } catch { 
-      setStats({}); 
-      setLeaderboard([]);
     }
-    finally { setLoading(false) }
-  }
+  })
+
+  const stats = data?.stats || {}
+  const leaderboard = data?.leaderboard || []
+  const chartData = data?.chartData || null
 
   if (loading) return (
     <div className="flex items-center justify-center h-48">

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Eye } from 'lucide-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import AgentDetailModal from '../components/AgentDetailModal'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+import { api } from '../api'
 
 const statusStyle: Record<string, string> = {
   APPROVED: 'bg-emerald-100 text-emerald-800',
@@ -11,42 +11,28 @@ const statusStyle: Record<string, string> = {
 }
 
 export default function Agents() {
-  const [agents, setAgents] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [selected, setSelected] = useState<any | null>(null)
 
-  useEffect(() => { fetchAgents() }, [])
+  const { data: agents = [], isLoading: loading } = useQuery({
+    queryKey: ['agents'],
+    queryFn: () => api.get('/agents')
+  })
 
-  async function fetchAgents() {
-    const token = localStorage.getItem('admin_token')
-    try {
-      const res = await fetch(`${API}/agents`, { headers: { Authorization: `Bearer ${token}` } })
-      const data = res.ok ? await res.json() : []
-      setAgents(Array.isArray(data) ? data : [])
-    } catch { setAgents([]) }
-    finally { setLoading(false) }
-  }
+  const updateStatus = useMutation({
+    mutationFn: ({ id, status }: { id: string, status: 'APPROVED' | 'REJECTED' }) => 
+      api.patch(`/agents/${id}/status`, { status }),
+    onSuccess: () => {
+      setSelected(null)
+      queryClient.invalidateQueries({ queryKey: ['agents'] })
+    }
+  })
 
-  async function updateStatus(id: string, status: 'APPROVED' | 'REJECTED') {
-    const token = localStorage.getItem('admin_token')
-    await fetch(`${API}/agents/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ status })
-    })
-    setSelected(null)
-    fetchAgents()
-  }
-
-  async function updatePrice(id: string, price: number | null) {
-    const token = localStorage.getItem('admin_token')
-    await fetch(`${API}/payout/agents/${id}/price`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ price }),
-    })
-    fetchAgents()
-  }
+  const updatePrice = useMutation({
+    mutationFn: ({ id, price }: { id: string, price: number | null }) => 
+      api.patch(`/payout/agents/${id}/price`, { price }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['agents'] })
+  })
 
   if (loading) return (
     <div className="flex items-center justify-center h-48">
@@ -95,8 +81,8 @@ export default function Agents() {
       <AgentDetailModal
         agent={selected}
         onClose={() => setSelected(null)}
-        onUpdateStatus={updateStatus}
-        onUpdatePrice={updatePrice}
+        onUpdateStatus={(id, status) => updateStatus.mutate({ id, status })}
+        onUpdatePrice={(id, price) => updatePrice.mutate({ id, price })}
       />
     </div>
   )

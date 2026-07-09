@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Car, MapPin, Eye, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import DriverDetailModal from '../components/DriverDetailModal'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+import { api } from '../api'
 
 const statusBadge = {
   VERIFIED: { icon: CheckCircle, cls: 'text-emerald-600 bg-emerald-100', label: 'Verified' },
@@ -11,49 +11,37 @@ const statusBadge = {
 }
 
 export default function Drivers() {
-  const [drivers, setDrivers] = useState<any[]>([])
-  const [total, setTotal] = useState(0)
+  const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [limit] = useState(50)
-  const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'VERIFIED' | 'DECLINED'>('ALL')
   const [selected, setSelected] = useState<any | null>(null)
 
-  useEffect(() => { fetchDrivers() }, [page])
+  const { data = { data: [], total: 0 }, isLoading: loading } = useQuery({
+    queryKey: ['drivers', page, limit],
+    queryFn: () => api.get(`/drivers?page=${page}&limit=${limit}`)
+  })
 
-  async function fetchDrivers() {
-    setLoading(true)
-    const token = localStorage.getItem('admin_token')
-    try {
-      const res = await fetch(`${API}/drivers?page=${page}&limit=${limit}`, { headers: { Authorization: `Bearer ${token}` } })
-      const json = res.ok ? await res.json() : { data: [], total: 0 }
-      setDrivers(json.data || [])
-      setTotal(json.total || 0)
-    } catch { 
-      setDrivers([])
-      setTotal(0)
+  const drivers = data.data || []
+  const total = data.total || 0
+
+  const verifyDriver = useMutation({
+    mutationFn: (id: string) => api.patch(`/drivers/${id}/verify`, {}),
+    onSuccess: () => {
+      setSelected(null)
+      queryClient.invalidateQueries({ queryKey: ['drivers'] })
     }
-    finally { setLoading(false) }
-  }
+  })
 
-  async function verifyDriver(id: string) {
-    const token = localStorage.getItem('admin_token')
-    await fetch(`${API}/drivers/${id}/verify`, { method: 'PATCH', headers: { Authorization: `Bearer ${token}` } })
-    setSelected(null)
-    fetchDrivers()
-  }
-
-  async function declineDriver(id: string, note: string) {
-    const token = localStorage.getItem('admin_token')
-    await fetch(`${API}/drivers/${id}/decline`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ admin_note: note }),
-    })
-    setSelected(null)
-    fetchDrivers()
-  }
+  const declineDriver = useMutation({
+    mutationFn: ({ id, note }: { id: string, note: string }) => 
+      api.patch(`/drivers/${id}/decline`, { admin_note: note }),
+    onSuccess: () => {
+      setSelected(null)
+      queryClient.invalidateQueries({ queryKey: ['drivers'] })
+    }
+  })
 
   const filtered = drivers
     .filter(d => filter === 'ALL' || d.status === filter)
@@ -159,7 +147,12 @@ export default function Drivers() {
         )}
       </div>
 
-      <DriverDetailModal driver={selected} onClose={() => setSelected(null)} onVerify={verifyDriver} onDecline={declineDriver} />
+      <DriverDetailModal 
+        driver={selected} 
+        onClose={() => setSelected(null)} 
+        onVerify={(id) => verifyDriver.mutate(id)} 
+        onDecline={(id, note) => declineDriver.mutate({ id, note })} 
+      />
     </div>
   )
 }
