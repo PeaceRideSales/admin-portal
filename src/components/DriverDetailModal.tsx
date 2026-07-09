@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { CheckCircle, XCircle, Phone, MapPin, Car, User, Calendar, FileText, AlertTriangle } from 'lucide-react'
+import { CheckCircle, XCircle, Phone, MapPin, Car, User, Calendar, FileText, AlertTriangle, UploadCloud, Loader2 } from 'lucide-react'
 import Modal from './Modal'
+
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 interface DriverDetailModalProps {
   driver: any | null
@@ -18,6 +20,13 @@ const statusConfig = {
 export default function DriverDetailModal({ driver, onClose, onVerify, onDecline }: DriverDetailModalProps) {
   const [showDeclineForm, setShowDeclineForm] = useState(false)
   const [declineNote, setDeclineNote] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [localDocUrl, setLocalDocUrl] = useState<string | null>(null)
+
+  // Reset local state when driver changes
+  if (driver && localDocUrl && driver.document_url !== localDocUrl && !uploading) {
+    setLocalDocUrl(null)
+  }
 
   function handleDecline() {
     if (onDecline && driver) {
@@ -31,8 +40,54 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
     if (onVerify && driver) onVerify(driver.id)
   }
 
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files || e.target.files.length === 0 || !driver) return
+    const file = e.target.files[0]
+    setUploading(true)
+
+    try {
+      const token = localStorage.getItem('admin_token')
+      const ext = file.name.split('.').pop()
+      const fileName = `${driver.id}-${Date.now()}.${ext}`
+
+      // 1. Get presigned URL
+      const res = await fetch(`${API}/upload/document/presigned`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ filename: fileName })
+      })
+      const presignedData = await res.json()
+      if (!res.ok) throw new Error(presignedData.message || 'Failed to get upload URL')
+
+      // 2. Upload file directly to Supabase storage
+      const uploadRes = await fetch(presignedData.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type },
+        body: file
+      })
+      if (!uploadRes.ok) throw new Error('Failed to upload file to storage')
+
+      // 3. Update driver record in backend
+      const docUrl = presignedData.publicUrl
+      const updateRes = await fetch(`${API}/drivers/${driver.id}/admin-document`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ document_url: docUrl })
+      })
+      if (!updateRes.ok) throw new Error('Failed to update driver record')
+      
+      setLocalDocUrl(docUrl)
+      alert('Document uploaded successfully!')
+    } catch (error: any) {
+      alert(`Upload failed: ${error.message}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const status = driver?.status || 'PENDING'
   const sc = statusConfig[status as keyof typeof statusConfig]
+  const currentDocUrl = localDocUrl || driver?.document_url
 
   return (
     <Modal isOpen={!!driver} onClose={() => { setShowDeclineForm(false); setDeclineNote(''); onClose() }} title={driver?.full_name || 'Driver Details'}>
@@ -88,14 +143,34 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
               <span className="text-slate-500 mr-2">Registered:</span>
               <span className="font-semibold text-slate-900">{new Date(driver.created_at).toLocaleDateString()}</span>
             </li>
-            {driver.document_url && (
-              <li className="flex items-center text-sm">
-                <FileText className="w-4 h-4 text-slate-400 mr-3 shrink-0" />
-                <a href={driver.document_url} target="_blank" rel="noreferrer" className="font-semibold text-blue-600 hover:underline">
-                  View Document ↗
-                </a>
-              </li>
-            )}
+            
+            <li className="pt-2">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Driver Document</p>
+              {currentDocUrl ? (
+                <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100">
+                  <div className="flex items-center">
+                    <FileText className="w-4 h-4 text-blue-500 mr-2" />
+                    <a href={currentDocUrl} target="_blank" rel="noreferrer" className="font-semibold text-sm text-blue-700 hover:underline">
+                      View Download
+                    </a>
+                  </div>
+                  <label className="text-xs font-bold text-blue-600 cursor-pointer hover:underline flex items-center">
+                    {uploading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <UploadCloud className="w-3 h-3 mr-1" />}
+                    {uploading ? 'Uploading...' : 'Replace'}
+                    <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileUpload} disabled={uploading} />
+                  </label>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 border-dashed">
+                  <span className="text-sm text-slate-500 italic">No document attached</span>
+                  <label className="text-xs font-bold text-blue-600 cursor-pointer hover:underline flex items-center bg-blue-50 px-3 py-1.5 rounded-md">
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-1" />}
+                    {uploading ? 'Uploading...' : 'Upload File'}
+                    <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileUpload} disabled={uploading} />
+                  </label>
+                </div>
+              )}
+            </li>
           </ul>
 
           {/* Verification Actions */}
