@@ -8,6 +8,7 @@ import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Payouts from './pages/Payouts'
 import AuditLogs from './pages/AuditLogs'
+import Notifications from './pages/Notifications'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('admin_token')
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
       {
         path: 'payouts',
         element: <Payouts />,
+      },
+      {
+        path: 'notifications',
+        element: <Notifications />,
       },
     ],
   },
