@@ -49,7 +49,7 @@ export default function Agents() {
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         <div className="divide-y divide-slate-100">
-          {agents.map(agent => (
+          {agents.map((agent: any) => (
             <div key={agent.id} onClick={() => setSelected(agent)}
               className="p-4 md:px-6 hover:bg-blue-50 cursor-pointer transition-colors group flex items-center justify-between">
               <div className="min-w-0">

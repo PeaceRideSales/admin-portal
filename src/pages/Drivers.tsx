@@ -44,8 +44,8 @@ export default function Drivers() {
   })
 
   const filtered = drivers
-    .filter(d => filter === 'ALL' || d.status === filter)
-    .filter(d =>
+    .filter((d: any) => filter === 'ALL' || d.status === filter)
+    .filter((d: any) =>
       d.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       d.location?.toLowerCase().includes(search.toLowerCase()) ||
       d.car_model?.toLowerCase().includes(search.toLowerCase())
@@ -83,7 +83,7 @@ export default function Drivers() {
         ) : (
           <>
             <div className="divide-y divide-slate-100 flex-1">
-              {filtered.map(driver => {
+              {filtered.map((driver: any) => {
                 const sb = statusBadge[driver.status as keyof typeof statusBadge] || statusBadge.PENDING
                 const Icon = sb.icon
                 return (
