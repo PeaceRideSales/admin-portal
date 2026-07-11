@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CheckCircle, XCircle, Phone, MapPin, Car, User, Calendar, FileText, AlertTriangle, UploadCloud, Loader2 } from 'lucide-react'
+import { CheckCircle, XCircle, Phone, MapPin, Car, User, Calendar, FileText, AlertTriangle, UploadCloud, Loader2, AlertCircle } from 'lucide-react'
 import Modal from './Modal'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
@@ -102,6 +102,15 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
             )}
           </div>
 
+          {driver.appealed && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex flex-col gap-1">
+              <div className="text-xs font-bold text-purple-700 uppercase tracking-wider flex items-center gap-2">
+                <AlertCircle className="w-4 h-4" /> Agent Appealed
+              </div>
+              <p className="text-sm text-purple-900 mt-1 italic">"{driver.appeal_reason}"</p>
+            </div>
+          )}
+
           {/* Contact & Location */}
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-slate-50 p-3 rounded-lg">
@@ -145,8 +154,29 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
             </li>
             
             <li className="pt-2">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Driver Document</p>
-              {currentDocUrl ? (
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Driver Documents</p>
+              {driver.documents && driver.documents.length > 0 ? (
+                <div className="space-y-2">
+                  {driver.documents.map((doc: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100">
+                      <div className="flex items-center">
+                        <FileText className="w-4 h-4 text-blue-500 mr-2" />
+                        <a href={doc.url} target="_blank" rel="noreferrer" className="font-semibold text-sm text-blue-700 hover:underline">
+                          {doc.type_id || 'Document'}
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 border-dashed">
+                    <span className="text-sm text-slate-500 italic">Add additional document</span>
+                    <label className="text-xs font-bold text-blue-600 cursor-pointer hover:underline flex items-center bg-blue-50 px-3 py-1.5 rounded-md">
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4 mr-1" />}
+                      {uploading ? 'Uploading...' : 'Upload File'}
+                      <input type="file" className="hidden" accept="image/*,.pdf" onChange={handleFileUpload} disabled={uploading} />
+                    </label>
+                  </div>
+                </div>
+              ) : currentDocUrl ? (
                 <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100">
                   <div className="flex items-center">
                     <FileText className="w-4 h-4 text-blue-500 mr-2" />

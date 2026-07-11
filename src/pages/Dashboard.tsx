@@ -42,6 +42,55 @@ export default function Dashboard() {
         <p className="text-slate-500 text-sm">Overview of Peace Ride operations</p>
       </div>
 
+      {/* Goal Progress */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Progress to 4000 Verified Drivers */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
+          <div className="flex justify-between items-end mb-2">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Driver Goal Progress</h3>
+              <p className="text-2xl font-black text-slate-900">
+                {stats.verified_drivers?.toLocaleString() || 0} <span className="text-lg text-slate-400 font-semibold">/ 4,000 Verified</span>
+              </p>
+            </div>
+            <div className="text-right">
+              <span className="text-emerald-600 font-bold text-lg">
+                {Math.min(100, Math.round(((stats.verified_drivers || 0) / 4000) * 100))}%
+              </span>
+            </div>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
+            <div 
+              className="bg-emerald-500 h-4 rounded-full transition-all duration-1000 ease-out" 
+              style={{ width: `${Math.min(100, ((stats.verified_drivers || 0) / 4000) * 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Progress to 1000 Approved Agents */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
+          <div className="flex justify-between items-end mb-2">
+            <div>
+              <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Agent Goal Progress</h3>
+              <p className="text-2xl font-black text-slate-900">
+                {stats.total_agents?.toLocaleString() || 0} <span className="text-lg text-slate-400 font-semibold">/ 1,000 Approved</span>
+              </p>
+            </div>
+            <div className="text-right">
+              <span className="text-blue-600 font-bold text-lg">
+                {Math.min(100, Math.round(((stats.total_agents || 0) / 1000) * 100))}%
+              </span>
+            </div>
+          </div>
+          <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
+            <div 
+              className="bg-blue-500 h-4 rounded-full transition-all duration-1000 ease-out" 
+              style={{ width: `${Math.min(100, ((stats.total_agents || 0) / 1000) * 100)}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4">
         <StatCard label="Total Drivers"      value={stats.total_drivers}      icon={<Car className="w-5 h-5" />}           color="blue" />
         <StatCard label="This Week"          value={stats.drivers_this_week}  icon={<TrendingUp className="w-5 h-5" />}    color="emerald" />

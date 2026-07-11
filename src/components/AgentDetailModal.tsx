@@ -116,6 +116,15 @@ export default function AgentDetailModal({ agent, onClose, onUpdateStatus, onUpd
                 <p className="text-slate-500 text-sm">@{agent.telegram_username}</p>
               </div>
 
+              {agent.appealed && (
+                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex flex-col gap-1 mb-2">
+                  <div className="text-xs font-bold text-purple-700 uppercase tracking-wider flex items-center gap-2 mb-1">
+                    <AlertCircle className="w-4 h-4" /> Account Appealed
+                  </div>
+                  <p className="text-sm text-purple-900 italic leading-relaxed">"{agent.appeal_reason}"</p>
+                </div>
+              )}
+
               {/* Stats row */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100">
@@ -188,6 +197,20 @@ export default function AgentDetailModal({ agent, onClose, onUpdateStatus, onUpd
                 )}
               </div>
 
+              {/* Agent Documents */}
+              {agent.documents && agent.documents.length > 0 && (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Agent Documents</h4>
+                  <div className="flex flex-col gap-2">
+                    {agent.documents.map((doc: any, i: number) => (
+                      <a key={i} href={doc.url} target="_blank" rel="noreferrer" className="text-sm font-semibold text-blue-600 hover:underline">
+                        View Document: {doc.type_id}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Status actions */}
               <div className="border-t border-slate-200 pt-4 space-y-3">
                 <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Account Actions</h4>
@@ -244,6 +267,17 @@ export default function AgentDetailModal({ agent, onClose, onUpdateStatus, onUpd
                       <div><span className="text-slate-400">Plate:</span> <span className="font-semibold text-slate-700 uppercase">{d.license_plate}</span></div>
                       <div><span className="text-slate-400">Car:</span> <span className="font-semibold text-slate-700">{d.car_type}</span></div>
                     </div>
+
+                    {d.documents && d.documents.length > 0 && (
+                      <div className="pt-2 border-t border-slate-100 flex flex-col gap-1">
+                        <span className="text-xs font-bold text-slate-400 uppercase">Documents</span>
+                        {d.documents.map((doc: any, i: number) => (
+                          <a key={i} href={doc.url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-blue-600 hover:underline">
+                            View {doc.type_id}
+                          </a>
+                        ))}
+                      </div>
+                    )}
 
                     {d.status === 'PENDING' && (
                       <div className="flex gap-2 pt-2 border-t border-slate-100">

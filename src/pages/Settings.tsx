@@ -7,6 +7,8 @@ export default function Settings() {
   const [priceLatest, setPriceLatest] = useState('150')
   const [priceOlder, setPriceOlder] = useState('120')
   const [googleSheetId, setGoogleSheetId] = useState('')
+  const [driverDocReqs, setDriverDocReqs] = useState<any[]>([])
+  const [agentDocReqs, setAgentDocReqs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -26,6 +28,8 @@ export default function Settings() {
         setPriceLatest(String(data.price_latest_model ?? 150))
         setPriceOlder(String(data.price_older_model ?? 120))
         setGoogleSheetId(data.google_sheet_id || '')
+        setDriverDocReqs(data.driver_document_requirements || [{ id: 'primary_document', name: 'Primary Document', required: true }])
+        setAgentDocReqs(data.agent_document_requirements || [{ id: 'primary_document', name: 'Primary Document', required: false }])
       }
     } catch { setError('Failed to load settings') }
     finally { setLoading(false) }
@@ -44,7 +48,9 @@ export default function Settings() {
         body: JSON.stringify({
           price_latest_model: parseFloat(priceLatest) || 150,
           price_older_model: parseFloat(priceOlder) || 120,
-          google_sheet_id: googleSheetId
+          google_sheet_id: googleSheetId,
+          driver_document_requirements: driverDocReqs,
+          agent_document_requirements: agentDocReqs
         })
       })
       if (!res.ok) throw new Error('Failed to save')
@@ -77,6 +83,20 @@ export default function Settings() {
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
     </div>
   )
+
+  function updateReq(reqs: any[], setReqs: any, index: number, field: string, value: any) {
+    const newReqs = [...reqs]
+    newReqs[index] = { ...newReqs[index], [field]: value }
+    setReqs(newReqs)
+  }
+
+  function addReq(reqs: any[], setReqs: any) {
+    setReqs([...reqs, { id: 'doc_' + Date.now(), name: 'New Document', required: false }])
+  }
+
+  function removeReq(reqs: any[], setReqs: any, index: number) {
+    setReqs(reqs.filter((_, i) => i !== index))
+  }
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -178,6 +198,60 @@ export default function Settings() {
             <p className="text-xs text-slate-500 mt-2">
               Found in your Google Sheets URL between <code>/d/</code> and <code>/edit</code>.
             </p>
+          </div>
+        </div>
+
+        {/* Document Requirements */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
+            <div className="w-9 h-9 bg-purple-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-lg">📄</span>
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-900">Document Requirements</h3>
+              <p className="text-xs text-slate-500">Configure what documents are needed during registration</p>
+            </div>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            {/* Driver Requirements */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold text-slate-700">Driver Documents</h4>
+                <button type="button" onClick={() => addReq(driverDocReqs, setDriverDocReqs)} className="text-xs text-blue-600 font-semibold hover:underline">+ Add Document</button>
+              </div>
+              <div className="space-y-3">
+                {driverDocReqs.map((req, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <input type="text" value={req.name} onChange={e => updateReq(driverDocReqs, setDriverDocReqs, i, 'name', e.target.value)} className="flex-1 px-3 py-1.5 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Document Name" />
+                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                      <input type="checkbox" checked={req.required} onChange={e => updateReq(driverDocReqs, setDriverDocReqs, i, 'required', e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500" />
+                      Required
+                    </label>
+                    <button type="button" onClick={() => removeReq(driverDocReqs, setDriverDocReqs, i)} className="text-red-500 p-1 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 pt-6">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold text-slate-700">Agent Documents</h4>
+                <button type="button" onClick={() => addReq(agentDocReqs, setAgentDocReqs)} className="text-xs text-blue-600 font-semibold hover:underline">+ Add Document</button>
+              </div>
+              <div className="space-y-3">
+                {agentDocReqs.map((req, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <input type="text" value={req.name} onChange={e => updateReq(agentDocReqs, setAgentDocReqs, i, 'name', e.target.value)} className="flex-1 px-3 py-1.5 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Document Name" />
+                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+                      <input type="checkbox" checked={req.required} onChange={e => updateReq(agentDocReqs, setAgentDocReqs, i, 'required', e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500" />
+                      Required
+                    </label>
+                    <button type="button" onClick={() => removeReq(agentDocReqs, setAgentDocReqs, i)} className="text-red-500 p-1 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
