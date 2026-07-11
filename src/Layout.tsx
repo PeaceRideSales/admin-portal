@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, Car, FileSpreadsheet, Settings, LogOut, Menu, X, Wallet, Shield, Bell } from 'lucide-react'
+import { LayoutDashboard, Users, Car, FileSpreadsheet, Settings, LogOut, Menu, X, Wallet, Shield, Bell, HeartHandshake } from 'lucide-react'
 
 const navItems = [
   { to: '/',               icon: LayoutDashboard, label: 'Dashboard',        end: true },
   { to: '/agents',         icon: Users,           label: 'Agents' },
   { to: '/drivers',        icon: Car,             label: 'Drivers' },
   { to: '/payouts',        icon: Wallet,          label: 'Payouts' },
+  { to: '/support',        icon: HeartHandshake,  label: 'Support' },
   { to: '/notifications',  icon: Bell,            label: 'Notifications' },
   { to: '/reports',        icon: FileSpreadsheet, label: 'Reports & Export' },
   { to: '/audit',          icon: Shield,          label: 'Audit Logs' },

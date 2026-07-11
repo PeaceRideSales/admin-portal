@@ -7,6 +7,7 @@ import Drivers from './pages/Drivers'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import Payouts from './pages/Payouts'
+import Support from './pages/Support'
 import AuditLogs from './pages/AuditLogs'
 import Notifications from './pages/Notifications'
 
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
       {
         path: 'payouts',
         element: <Payouts />,
+      },
+      {
+        path: 'support',
+        element: <Support />,
       },
       {
         path: 'notifications',
