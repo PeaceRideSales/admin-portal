@@ -156,17 +156,40 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
             <li className="pt-2">
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Driver Documents</p>
               {driver.documents && driver.documents.length > 0 ? (
-                <div className="space-y-2">
-                  {driver.documents.map((doc: any, i: number) => (
-                    <div key={i} className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100">
-                      <div className="flex items-center">
-                        <FileText className="w-4 h-4 text-blue-500 mr-2" />
-                        <a href={doc.url} target="_blank" rel="noreferrer" className="font-semibold text-sm text-blue-700 hover:underline">
-                          {doc.type_id || 'Document'}
-                        </a>
+                <div className="space-y-3">
+                  {driver.documents.map((doc: any, i: number) => {
+                    const isImage = doc.url && /\.(jpe?g|png|gif|webp|heic)$/i.test(doc.url)
+                    return (
+                      <div key={i} className="bg-blue-50 rounded-xl border border-blue-100 overflow-hidden">
+                        {isImage && (
+                          <a href={doc.url} target="_blank" rel="noreferrer">
+                            <img
+                              src={doc.url}
+                              alt={doc.type_id || 'Document'}
+                              className="w-full max-h-48 object-cover block"
+                            />
+                          </a>
+                        )}
+                        <div className="flex items-center justify-between p-3">
+                          <div className="flex items-center">
+                            <FileText className="w-4 h-4 text-blue-500 mr-2 shrink-0" />
+                            <span className="font-semibold text-sm text-slate-700 truncate max-w-[140px]">
+                              {doc.type_id || 'Document'}
+                            </span>
+                          </div>
+                          <a
+                            href={doc.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            download
+                            className="flex items-center gap-1 text-xs font-bold text-blue-600 bg-white border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors shrink-0"
+                          >
+                            ⬇ Download
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                   <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200 border-dashed">
                     <span className="text-sm text-slate-500 italic">Add additional document</span>
                     <label className="text-xs font-bold text-blue-600 cursor-pointer hover:underline flex items-center bg-blue-50 px-3 py-1.5 rounded-md">
