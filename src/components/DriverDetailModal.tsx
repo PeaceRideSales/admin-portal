@@ -52,6 +52,7 @@ function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value
 }
 
 async function downloadViaProxy(fileUrl: string, docName: string) {
+  if (!fileUrl) throw new Error('No valid URL provided for download.')
   const ext = fileUrl.split('.').pop()?.split('?')[0] || 'bin'
   const safeName = `${docName.replace(/[^a-zA-Z0-9]/g, '_')}.${ext}`
   const proxyUrl = `${API}/upload/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(safeName)}`
@@ -248,11 +249,12 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
           ) : (
             <div className="space-y-2">
               {allDocs.map((doc: any, i: number) => {
-                const isImage = doc.url && /\.(jpe?g|png|gif|webp|heic)$/i.test(doc.url.split('?')[0])
-                const isPDF = doc.url && /\.pdf$/i.test(doc.url.split('?')[0])
+                const docUrl = typeof doc === 'string' ? doc : doc.url
+                const isImage = docUrl && /\.(jpe?g|png|gif|webp|heic)$/i.test(docUrl.split('?')[0])
+                const isPDF = docUrl && /\.pdf$/i.test(docUrl.split('?')[0])
                 const isExpanded = expandedDoc === i
-                const isDown = downloading === doc.url
-                const docName = doc.type_id || `Document ${i + 1}`
+                const isDown = downloading === docUrl
+                const docName = (typeof doc === 'object' && doc.type_id) ? doc.type_id : `Document ${i + 1}`
 
                 return (
                   <div key={i} className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
@@ -260,7 +262,7 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
                     {isImage && isExpanded && (
                       <div className="relative bg-slate-100 border-b border-slate-100">
                         <img
-                          src={doc.url}
+                          src={docUrl}
                           alt={docName}
                           className="w-full max-h-64 object-contain block"
                           loading="lazy"
@@ -308,7 +310,7 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
 
                         {/* Open in tab */}
                         <a
-                          href={doc.url}
+                          href={docUrl}
                           target="_blank"
                           rel="noreferrer"
                           className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
@@ -319,7 +321,7 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
 
                         {/* Download via proxy */}
                         <button
-                          onClick={() => handleDownload(doc.url, docName)}
+                          onClick={() => handleDownload(docUrl, docName)}
                           disabled={isDown}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors disabled:opacity-60"
                           title="Download file"
