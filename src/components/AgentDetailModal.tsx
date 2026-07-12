@@ -202,11 +202,15 @@ export default function AgentDetailModal({ agent, onClose, onUpdateStatus, onUpd
                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
                   <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Agent Documents</h4>
                   <div className="flex flex-col gap-2">
-                    {agent.documents.map((doc: any, i: number) => (
-                      <a key={i} href={doc.url} target="_blank" rel="noreferrer" className="text-sm font-semibold text-blue-600 hover:underline">
-                        View Document: {doc.type_id}
-                      </a>
-                    ))}
+                    {agent.documents.map((doc: any, i: number) => {
+                      const docUrl = typeof doc === 'string' ? doc : (doc?.url || doc?.document_url || doc?.file_url || doc?.fileUrl || '')
+                      const docName = (typeof doc === 'object' && doc?.type_id) ? doc.type_id : `Document ${i + 1}`
+                      return (
+                        <a key={i} href={docUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-blue-600 hover:underline">
+                          View Document: {docName}
+                        </a>
+                      )
+                    })}
                   </div>
                 </div>
               )}

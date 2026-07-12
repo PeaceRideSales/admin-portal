@@ -249,12 +249,12 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
           ) : (
             <div className="space-y-2">
               {allDocs.map((doc: any, i: number) => {
-                const docUrl = typeof doc === 'string' ? doc : doc.url
+                const docUrl = typeof doc === 'string' ? doc : (doc?.url || doc?.document_url || doc?.file_url || doc?.fileUrl || '')
                 const isImage = docUrl && /\.(jpe?g|png|gif|webp|heic)$/i.test(docUrl.split('?')[0])
                 const isPDF = docUrl && /\.pdf$/i.test(docUrl.split('?')[0])
                 const isExpanded = expandedDoc === i
                 const isDown = downloading === docUrl
-                const docName = (typeof doc === 'object' && doc.type_id) ? doc.type_id : `Document ${i + 1}`
+                const docName = (typeof doc === 'object' && doc?.type_id) ? doc.type_id : `Document ${i + 1}`
 
                 return (
                   <div key={i} className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
@@ -322,7 +322,7 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
                         {/* Download via proxy */}
                         <button
                           onClick={() => handleDownload(docUrl, docName)}
-                          disabled={isDown}
+                          disabled={isDown || !docUrl}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors disabled:opacity-60"
                           title="Download file"
                         >
