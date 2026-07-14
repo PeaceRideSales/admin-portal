@@ -63,7 +63,7 @@ export default function Support() {
     <div className="h-[calc(100vh-8rem)] flex bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
       {/* Sidebar */}
       <div className="w-1/3 border-r border-slate-200 flex flex-col bg-slate-50">
-        <div className="p-4 border-b border-slate-200 bg-white">
+        <div className="p-4 border-b border-slate-300 bg-white">
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <HeartHandshake className="w-5 h-5 text-blue-600" />
             Support Chats
@@ -126,7 +126,7 @@ export default function Support() {
         {selectedChat ? (
           <>
             {/* Header */}
-            <div className="p-4 border-b border-slate-200 bg-white flex justify-between items-center shadow-sm z-10">
+            <div className="p-4 border-b border-slate-300 bg-white flex justify-between items-center shadow-sm z-10">
               <div>
                 <h3 className="font-bold text-slate-900">{selectedChat.agent.full_name || 'Agent'}</h3>
                 <p className="text-xs text-slate-500">@{selectedChat.agent.telegram_username}</p>
@@ -163,7 +163,7 @@ export default function Support() {
             </div>
 
             {/* Input */}
-            <div className="p-4 bg-white border-t border-slate-200">
+            <div className="p-4 bg-white border-t border-slate-300">
               <form onSubmit={handleReply} className="flex gap-2">
                 <textarea
                   value={replyText}

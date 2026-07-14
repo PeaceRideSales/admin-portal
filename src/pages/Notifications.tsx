@@ -100,14 +100,14 @@ export default function Notifications() {
             placeholder="Search by chat ID or message..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full pl-9 pr-4 py-3 text-sm clay-pressed border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <div className="flex gap-2">
           {(['ALL', 'PENDING', 'COMPLETED', 'FAILED'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-                statusFilter === s ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-blue-300'
+                statusFilter === s ? 'clay-pressed text-blue-600' : 'clay-btn text-slate-500 hover:text-blue-600'
               }`}
             >{s}</button>
           ))}
@@ -115,7 +115,7 @@ export default function Notifications() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="clay-card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-48">
             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -163,7 +163,7 @@ export default function Notifications() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-xl">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-300 bg-slate-50 rounded-b-xl">
             <p className="text-sm text-slate-500">
               Page <span className="font-medium">{page}</span> of <span className="font-medium">{totalPages}</span>
             </p>

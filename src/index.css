@@ -1,5 +1,197 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-clay-bg: #eef2ff;
+}
+
 body {
-  @apply bg-slate-50 text-slate-900 min-h-screen antialiased overflow-x-hidden w-full;
+  @apply bg-blue-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen antialiased overflow-x-hidden w-full transition-colors duration-300;
+}
+
+@layer utilities {
+  /* ─── Light mode clay (blue-tinted) ─────────────────────── */
+  .clay-card {
+    @apply bg-blue-50 dark:bg-slate-800 rounded-3xl transition-all duration-300;
+    box-shadow: 
+      12px 12px 24px #c3cce6,
+      -12px -12px 24px #ffffff;
+  }
+  /* Dark: drop = near-black, highlight = just 10% lighter than card */
+  .dark .clay-card {
+    box-shadow: 
+      12px 12px 28px #0c1220,
+      -12px -12px 28px #263248;
+  }
+  
+  .clay-pressed {
+    @apply bg-blue-50 dark:bg-slate-800 rounded-3xl transition-all duration-300;
+    box-shadow: 
+      inset 6px 6px 12px #c3cce6,
+      inset -6px -6px 12px #ffffff;
+  }
+  .dark .clay-pressed {
+    box-shadow: 
+      inset 6px 6px 14px #0c1220,
+      inset -6px -6px 14px #263248;
+  }
+  
+  .clay-btn {
+    @apply bg-blue-50 dark:bg-slate-800 rounded-2xl font-bold transition-all duration-300;
+    box-shadow: 
+      6px 6px 12px #c3cce6,
+      -6px -6px 12px #ffffff;
+  }
+  .dark .clay-btn {
+    box-shadow: 
+      6px 6px 12px #0c1220,
+      -6px -6px 12px #263248;
+  }
+  .clay-btn:active {
+    box-shadow: 
+      inset 4px 4px 8px #c3cce6,
+      inset -4px -4px 8px #ffffff;
+  }
+  .dark .clay-btn:active {
+    box-shadow: 
+      inset 4px 4px 8px #0c1220,
+      inset -4px -4px 8px #263248;
+  }
+
+  /* ─── Colored clay buttons ───────────────────────────────── */
+  /* For colored buttons on dark, outer shadow uses color-tinted darks */
+  .clay-btn-blue {
+    @apply bg-blue-500 dark:bg-blue-600 text-white rounded-2xl font-bold transition-all duration-200;
+    box-shadow: 
+      8px 8px 16px #94a3b8,
+      -8px -8px 16px #ffffff,
+      inset 3px 3px 8px rgba(255, 255, 255, 0.35),
+      inset -3px -3px 8px rgba(0, 0, 0, 0.15);
+  }
+  .dark .clay-btn-blue {
+    box-shadow: 
+      8px 8px 16px #0c1220,
+      -8px -8px 16px #1e3a6e,
+      inset 3px 3px 8px rgba(255,255,255,0.15),
+      inset -3px -3px 8px rgba(0,0,0,0.4);
+  }
+  .clay-btn-blue:active {
+    box-shadow: inset 6px 6px 12px rgba(0,0,0,0.25), inset -6px -6px 12px rgba(255,255,255,0.3);
+  }
+
+  .clay-bg-blue {
+    @apply bg-blue-500 text-white dark:bg-blue-600;
+  }
+
+  /* Blue sidebar card */
+  .clay-card-blue {
+    @apply bg-blue-500 dark:bg-blue-700 rounded-3xl text-white border-0 transition-colors duration-300;
+    box-shadow: 
+      12px 12px 24px #1d4ed8,
+      -12px -12px 24px #60a5fa;
+  }
+  .dark .clay-card-blue {
+    box-shadow: 
+      12px 12px 28px #0c1834,
+      -12px -12px 28px #1e4080;
+  }
+  
+  .clay-pressed-blue {
+    @apply bg-blue-600 dark:bg-blue-700 rounded-2xl text-white transition-colors duration-300;
+    box-shadow: 
+      inset 6px 6px 12px #1d4ed8,
+      inset -6px -6px 12px #93c5fd;
+  }
+  .dark .clay-pressed-blue {
+    box-shadow: 
+      inset 6px 6px 12px #0c1834,
+      inset -6px -6px 12px #1e4080;
+  }
+
+  .clay-btn-emerald {
+    @apply bg-emerald-500 dark:bg-emerald-600 text-white rounded-2xl font-bold transition-all duration-200;
+    box-shadow: 
+      8px 8px 16px #94a3b8,
+      -8px -8px 16px #ffffff,
+      inset 3px 3px 8px rgba(255, 255, 255, 0.35),
+      inset -3px -3px 8px rgba(0, 0, 0, 0.15);
+  }
+  .dark .clay-btn-emerald {
+    box-shadow: 
+      8px 8px 16px #0c1220,
+      -8px -8px 16px #064e30,
+      inset 3px 3px 8px rgba(255,255,255,0.15),
+      inset -3px -3px 8px rgba(0,0,0,0.4);
+  }
+
+  .clay-btn-amber {
+    @apply bg-amber-500 dark:bg-amber-600 text-white rounded-2xl font-bold transition-all duration-200;
+    box-shadow: 
+      8px 8px 16px #94a3b8,
+      -8px -8px 16px #ffffff,
+      inset 3px 3px 8px rgba(255, 255, 255, 0.35),
+      inset -3px -3px 8px rgba(0, 0, 0, 0.15);
+  }
+  .dark .clay-btn-amber {
+    box-shadow: 
+      8px 8px 16px #0c1220,
+      -8px -8px 16px #4a2c00,
+      inset 3px 3px 8px rgba(255,255,255,0.15),
+      inset -3px -3px 8px rgba(0,0,0,0.4);
+  }
+
+  .clay-btn-indigo {
+    @apply bg-indigo-500 dark:bg-indigo-600 text-white rounded-2xl font-bold transition-all duration-200;
+    box-shadow: 
+      8px 8px 16px #94a3b8,
+      -8px -8px 16px #ffffff,
+      inset 3px 3px 8px rgba(255, 255, 255, 0.35),
+      inset -3px -3px 8px rgba(0, 0, 0, 0.15);
+  }
+  .dark .clay-btn-indigo {
+    box-shadow: 
+      8px 8px 16px #0c1220,
+      -8px -8px 16px #1e1b5e,
+      inset 3px 3px 8px rgba(255,255,255,0.15),
+      inset -3px -3px 8px rgba(0,0,0,0.4);
+  }
+
+  .clay-btn-rose {
+    @apply bg-rose-500 dark:bg-rose-600 text-white rounded-2xl font-bold transition-all duration-200;
+    box-shadow: 
+      8px 8px 16px #94a3b8,
+      -8px -8px 16px #ffffff,
+      inset 3px 3px 8px rgba(255, 255, 255, 0.35),
+      inset -3px -3px 8px rgba(0, 0, 0, 0.15);
+  }
+  .dark .clay-btn-rose {
+    box-shadow: 
+      8px 8px 16px #0c1220,
+      -8px -8px 16px #4c0f1c,
+      inset 3px 3px 8px rgba(255,255,255,0.15),
+      inset -3px -3px 8px rgba(0,0,0,0.4);
+  }
+
+  /* ─── List cards ─────────────────────────────────────────── */
+  .clay-list-card {
+    @apply rounded-3xl cursor-pointer transition-all duration-300;
+    box-shadow: 6px 6px 12px #c3cce6, -6px -6px 12px #ffffff;
+  }
+  .clay-list-card:hover {
+    box-shadow: inset 4px 4px 8px #c3cce6, inset -4px -4px 8px #ffffff;
+  }
+  .dark .clay-list-card {
+    box-shadow: 6px 6px 12px #0c1220, -6px -6px 12px #263248;
+  }
+  .dark .clay-list-card:hover {
+    box-shadow: inset 4px 4px 8px #0c1220, inset -4px -4px 8px #263248;
+  }
+
+  /* ─── Dark mode colorful tints for list cards ────────────── */
+  .dark .bg-blue-100    { background-color: rgba(37, 99, 235, 0.12); }
+  .dark .bg-emerald-100 { background-color: rgba(5, 150, 105, 0.12); }
+  .dark .bg-amber-100   { background-color: rgba(180, 83, 9, 0.12); }
+  .dark .bg-indigo-100  { background-color: rgba(67, 56, 202, 0.12); }
+  .dark .bg-rose-100    { background-color: rgba(190, 18, 60, 0.12); }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { DollarSign, Users, TrendingUp, Edit2, Check, X } from 'lucide-react'
+import { DollarSign, Users, TrendingUp, Edit2, Check, X, Car, Clock, AlertCircle } from 'lucide-react'
 import StatCard from '../components/StatCard'
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
@@ -20,28 +20,32 @@ function PriceField({ label, value, onSave, badge, badgeColor }: {
   }
 
   return (
-    <div className="flex items-center justify-between py-1">
-      <span className="flex items-center gap-1.5 text-xs text-slate-500">
-        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${badgeColor}`}>{badge}</span>
+    <div className="flex items-center justify-between py-1.5 border-b border-slate-700/50 last:border-0">
+      <span className="flex items-center gap-2 text-xs text-slate-300">
+        <span className={`px-2 py-0.5 rounded-lg text-[9px] font-bold uppercase tracking-wider ${badgeColor}`}>{badge}</span>
         {label}
       </span>
       {editing ? (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <input type="number" min="0" step="1" value={input}
             onChange={e => setInput(e.target.value)}
-            className="w-20 px-2 py-1 text-sm border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-20 px-2 py-1 text-sm bg-slate-700 border border-blue-500/60 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             autoFocus
           />
           <span className="text-xs text-slate-400">Birr</span>
-          <button onClick={handleSave} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded"><Check className="w-3.5 h-3.5" /></button>
-          <button onClick={() => { setEditing(false); setInput(value !== null ? String(value) : '') }} className="p-1 text-slate-400 hover:bg-slate-100 rounded"><X className="w-3.5 h-3.5" /></button>
+          <button onClick={handleSave} className="p-1 text-emerald-400 hover:bg-emerald-900/30 rounded-lg transition-colors">
+            <Check className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={() => { setEditing(false); setInput(value !== null ? String(value) : '') }} className="p-1 text-slate-500 hover:bg-slate-700 rounded-lg transition-colors">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       ) : (
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-slate-700">
-            {value !== null ? `${value} Birr` : <span className="text-slate-400 italic text-xs">global default</span>}
+          <span className="text-sm font-bold text-white">
+            {value !== null ? `${value} Birr` : <span className="text-slate-500 italic text-xs font-normal">global default</span>}
           </span>
-          <button onClick={() => setEditing(true)} className="p-1 text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded transition-colors">
+          <button onClick={() => setEditing(true)} className="p-1 text-slate-500 hover:text-blue-400 hover:bg-blue-900/30 rounded-lg transition-colors">
             <Edit2 className="w-3 h-3" />
           </button>
         </div>
@@ -55,48 +59,64 @@ function AgentPayoutRow({ agent, onPriceChange }: {
   onPriceChange: (id: string, field: string, value: number | null) => void
 }) {
   return (
-    <div className="p-4 md:px-6 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors">
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h4 className="font-semibold text-slate-900 text-sm">{agent.full_name || 'Unknown'}</h4>
-          <p className="text-xs text-slate-500">@{agent.telegram_username}</p>
-          <div className="flex gap-3 mt-1 text-xs text-slate-400 flex-wrap">
-            <span className="text-emerald-600 font-semibold">{agent.verified_drivers} verified</span>
-            <span className="text-amber-600">{agent.pending_drivers} pending</span>
-            {agent.declined_drivers > 0 && <span className="text-red-500">{agent.declined_drivers} declined</span>}
+    <div className="p-4 md:px-6">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        {/* Left: Agent info */}
+        <div className="min-w-0 flex-1">
+          <h4 className="font-bold text-white text-base">{agent.full_name || 'Unknown'}</h4>
+          <p className="text-xs text-slate-400 mt-0.5">@{agent.telegram_username}</p>
+
+          {/* Driver stats */}
+          <div className="flex flex-wrap gap-2 mt-2">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 bg-emerald-900/30 px-2 py-1 rounded-lg">
+              <Car className="w-3 h-3" />{agent.verified_drivers} verified
+            </span>
+            {agent.pending_drivers > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-400 bg-amber-900/30 px-2 py-1 rounded-lg">
+                <Clock className="w-3 h-3" />{agent.pending_drivers} pending
+              </span>
+            )}
+            {agent.declined_drivers > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-400 bg-rose-900/30 px-2 py-1 rounded-lg">
+                <AlertCircle className="w-3 h-3" />{agent.declined_drivers} declined
+              </span>
+            )}
           </div>
+
+          {/* Payment method */}
           {agent.payment_method && agent.payment_details && (
-            <div className="mt-1.5 text-xs bg-slate-100 px-2 py-1 rounded inline-block">
-              <span className="font-semibold text-slate-600">{agent.payment_method}:</span>{' '}
-              <span className="text-slate-800 font-mono select-all">{agent.payment_details}</span>
+            <div className="mt-2 text-xs bg-slate-700/60 px-3 py-1.5 rounded-xl inline-flex items-center gap-2">
+              <span className="font-bold text-slate-300">{agent.payment_method}:</span>
+              <span className="text-white font-mono select-all tracking-wide">{agent.payment_details}</span>
             </div>
           )}
         </div>
 
-        <div className="flex items-start gap-6">
-          {/* Per-agent tier price overrides */}
-          <div className="min-w-[200px] space-y-1.5 border border-slate-100 rounded-lg px-3 py-2 bg-slate-50">
+        {/* Right: Override + Payout */}
+        <div className="flex flex-col sm:flex-row items-start gap-4 shrink-0">
+          {/* Price overrides */}
+          <div className="min-w-[210px] border border-slate-600/50 rounded-2xl px-4 py-3 bg-slate-800/60">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Agent Overrides</p>
             <PriceField
               label="Latest / EV"
               value={agent.price_latest_model}
               onSave={v => onPriceChange(agent.id, 'price_latest_model', v)}
               badge="Latest"
-              badgeColor="bg-purple-100 text-purple-700"
+              badgeColor="bg-indigo-900/60 text-indigo-300"
             />
             <PriceField
               label="Older Model"
               value={agent.price_older_model}
               onSave={v => onPriceChange(agent.id, 'price_older_model', v)}
               badge="Older"
-              badgeColor="bg-slate-200 text-slate-600"
+              badgeColor="bg-slate-700 text-slate-300"
             />
           </div>
 
           {/* Payout total */}
-          <div className="text-right min-w-[80px]">
-            <p className="text-lg font-bold text-slate-900">{agent.payout.toFixed(0)}</p>
-            <p className="text-xs text-slate-400">Birr total</p>
+          <div className="text-right min-w-[90px] bg-slate-800/60 rounded-2xl px-4 py-3 border border-slate-600/50">
+            <p className="text-2xl font-black text-white leading-none">{agent.payout.toFixed(0)}</p>
+            <p className="text-xs text-slate-400 font-semibold mt-1">Birr total</p>
           </div>
         </div>
       </div>
@@ -129,13 +149,17 @@ export default function Payouts() {
     fetchSummary()
   }
 
-  if (loading) return <div className="flex items-center justify-center h-48"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-48">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Payouts</h1>
-        <p className="text-slate-500 text-sm">Earnings based on verified drivers · Tiered by vehicle category</p>
+        <h1 className="text-2xl font-bold text-white mb-1">Payouts</h1>
+        <p className="text-slate-400 text-sm">Earnings based on verified drivers · Tiered by vehicle category</p>
       </div>
 
       {/* Summary cards */}
@@ -147,27 +171,43 @@ export default function Payouts() {
         <StatCard label="Latest/EV Rate" value={`${summary?.global_price_latest_model || 150} Birr`}
           icon={<Users className="w-5 h-5" />} color="indigo" />
         <StatCard label="Older Rate" value={`${summary?.global_price_older_model || 120} Birr`}
-          icon={<Users className="w-5 h-5" />} color="indigo" />
+          icon={<Users className="w-5 h-5" />} color="amber" />
       </div>
 
       {/* Per-agent table */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-5 border-b border-slate-200">
-          <h3 className="font-semibold text-slate-900">Per-Agent Breakdown</h3>
-          <p className="text-xs text-slate-500 mt-1">Click the ✏️ pencil icon to override prices for a specific agent (leave blank to use global rates)</p>
+      <div className="clay-card overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-700/60 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-white text-lg">Per-Agent Breakdown</h3>
+            <p className="text-xs text-slate-400 mt-1">Click the ✏️ pencil to override rates per agent — leave blank to use global rates</p>
+          </div>
         </div>
-        <div>
-          {(summary?.agents || []).map((agent: any) => (
-            <AgentPayoutRow key={agent.id} agent={agent} onPriceChange={handlePriceChange} />
-          ))}
+
+        <div className="p-4 space-y-4 bg-slate-900/30">
+          {(summary?.agents || []).map((agent: any, idx: number) => {
+            const colors = ['bg-blue-100', 'bg-emerald-100', 'bg-amber-100', 'bg-indigo-100', 'bg-rose-100']
+            const colorBg = colors[idx % colors.length]
+            return (
+              <div key={agent.id} className={`clay-list-card ${colorBg}`}>
+                <AgentPayoutRow agent={agent} onPriceChange={handlePriceChange} />
+              </div>
+            )
+          })}
           {(!summary?.agents?.length) && (
-            <div className="p-10 text-center text-slate-400">No approved agents yet.</div>
+            <div className="p-10 text-center text-slate-500 font-bold">No approved agents yet.</div>
           )}
         </div>
+
         {summary?.agents?.length > 0 && (
-          <div className="px-6 py-4 bg-blue-50 border-t border-blue-100 flex justify-between items-center">
-            <span className="font-bold text-slate-700">Grand Total</span>
-            <span className="text-xl font-bold text-blue-700">{(summary?.total_payout || 0).toFixed(0)} Birr</span>
+          <div className="px-6 py-5 bg-slate-800/60 border-t border-slate-700/60 flex justify-between items-center">
+            <div>
+              <span className="font-bold text-white text-base">Grand Total</span>
+              <p className="text-xs text-slate-400 mt-0.5">{summary.agents.length} agents</p>
+            </div>
+            <div className="text-right">
+              <span className="text-2xl font-black text-emerald-400">{(summary?.total_payout || 0).toFixed(0)}</span>
+              <span className="text-sm text-slate-400 ml-1.5">Birr</span>
+            </div>
           </div>
         )}
       </div>

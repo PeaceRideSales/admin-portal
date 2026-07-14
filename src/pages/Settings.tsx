@@ -116,8 +116,8 @@ export default function Settings() {
         )}
 
         {/* Tiered Global Pricing */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
+        <div className="clay-card overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-300 flex items-center gap-3">
             <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center">
               <DollarSign className="w-5 h-5 text-white" />
             </div>
@@ -177,8 +177,8 @@ export default function Settings() {
         </div>
 
         {/* Google Sheets */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
+        <div className="clay-card overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-300 flex items-center gap-3">
             <div className="w-9 h-9 bg-emerald-600 rounded-lg flex items-center justify-center">
               <Car className="w-5 h-5 text-white" />
             </div>
@@ -202,8 +202,8 @@ export default function Settings() {
         </div>
 
         {/* Document Requirements */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-5 border-b border-slate-200 flex items-center gap-3">
+        <div className="clay-card overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-300 flex items-center gap-3">
             <div className="w-9 h-9 bg-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white text-lg">📄</span>
             </div>
@@ -284,7 +284,7 @@ export default function Settings() {
                 <Trash2 className="w-4 h-4" /> Reset System for Production
               </button>
             ) : (
-              <div className="bg-white p-4 rounded-lg border border-red-200 shadow-sm space-y-3">
+              <div className="clay-card p-4 border border-red-200 space-y-3">
                 <p className="text-sm font-semibold text-slate-800">Are you absolutely sure?</p>
                 <p className="text-xs text-slate-500">Type <strong className="text-red-600 font-mono">RESET</strong> to confirm.</p>
                 <div className="flex items-center gap-2">

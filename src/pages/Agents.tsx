@@ -47,35 +47,40 @@ export default function Agents() {
         <p className="text-slate-500 text-sm">{agents.length} total agents</p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="divide-y divide-slate-100">
-          {agents.map((agent: any) => (
+      <div className="space-y-4">
+        {agents.map((agent: any, idx: number) => {
+          // pick a subtle colorful tint based on index
+          const colors = ['bg-blue-100', 'bg-emerald-100', 'bg-amber-100', 'bg-indigo-100', 'bg-rose-100']
+          const colorBg = colors[idx % colors.length]
+          return (
             <div key={agent.id} onClick={() => setSelected(agent)}
-              className="p-4 md:px-6 hover:bg-blue-50 cursor-pointer transition-colors group flex items-center justify-between">
-              <div className="min-w-0">
+              className={`clay-list-card p-4 md:px-6 flex items-center justify-between ${colorBg}`}>
+              <div className="flex items-center space-x-4 min-w-0">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h4 className="font-semibold text-slate-900 text-sm group-hover:text-blue-700 transition-colors">
+                  <h4 className="font-bold text-slate-800 dark:text-slate-100 text-base transition-colors">
                     {agent.full_name || 'Unknown Name'}
                   </h4>
                   <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${statusStyle[agent.status]}`}>
                     {agent.status}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">@{agent.telegram_username}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-semibold">@{agent.telegram_username}</p>
               </div>
               <div className="flex items-center gap-4 shrink-0 ml-4">
-                <div className="hidden sm:block text-right">
-                  <p className="text-sm font-bold text-slate-900">{agent.driver_count}</p>
-                  <p className="text-xs text-slate-400">drivers</p>
+                <div className="hidden sm:block text-right bg-white/50 dark:bg-white/10 px-3 py-1.5 rounded-2xl">
+                  <p className="text-base font-black text-slate-800 dark:text-white">{agent.driver_count}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">drivers</p>
                 </div>
-                <Eye className="w-4 h-4 text-slate-300 group-hover:text-blue-500" />
+                <div className="w-10 h-10 bg-white dark:bg-slate-700 rounded-2xl flex items-center justify-center clay-btn text-slate-400">
+                  <Eye className="w-5 h-5" />
+                </div>
               </div>
             </div>
-          ))}
-          {agents.length === 0 && (
-            <div className="p-10 text-center text-slate-400">No agents registered yet.</div>
-          )}
-        </div>
+          )
+        })}
+        {agents.length === 0 && (
+          <div className="clay-card p-10 text-center text-slate-400 font-bold">No agents registered yet.</div>
+        )}
       </div>
 
       <AgentDetailModal

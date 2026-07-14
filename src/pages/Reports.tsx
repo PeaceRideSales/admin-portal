@@ -91,7 +91,7 @@ export default function Reports() {
     <div className="max-w-4xl space-y-6">
       
       {/* Global Export */}
-      <div className="bg-white p-6 border border-slate-200 rounded-xl shadow-sm">
+      <div className="clay-card p-6">
         <div className="flex items-start">
           <div className="p-3 bg-blue-50 rounded-lg text-blue-600 mr-4">
             <FileSpreadsheet size={24} />
@@ -122,7 +122,7 @@ export default function Reports() {
       </div>
 
       {/* Per-Agent Export */}
-      <div className="bg-white p-6 border border-slate-200 rounded-xl shadow-sm">
+      <div className="clay-card p-6">
         <div className="flex items-start">
           <div className="p-3 bg-indigo-50 rounded-lg text-indigo-600 mr-4">
             <UserSquare2 size={24} />

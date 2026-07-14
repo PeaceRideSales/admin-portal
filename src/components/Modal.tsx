@@ -32,19 +32,29 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       />
 
       {/* Modal Dialog */}
-      <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg transform transition-all overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="relative clay-card w-full max-w-lg transform transition-all overflow-hidden max-h-[90vh] flex flex-col border border-white/50">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between shrink-0">
-          <h3 className="text-lg font-semibold text-slate-900 truncate pr-4">
-            {title}
-          </h3>
+        {title && (
+          <div className="px-6 py-4 border-b border-blue-200/50 flex items-center justify-between shrink-0">
+            <h3 className="text-lg font-bold text-slate-800 truncate pr-4">
+              {title}
+            </h3>
+            <button
+              onClick={onClose}
+              className="clay-btn p-2 text-slate-400 hover:text-rose-500 transition-colors shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+        {!title && (
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full transition-colors shrink-0"
+            className="absolute top-4 right-4 z-50 clay-btn p-2 text-slate-400 hover:text-rose-500 transition-colors shrink-0 rounded-full"
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
+        )}
 
         {/* Content */}
         <div className="p-6 overflow-y-auto">

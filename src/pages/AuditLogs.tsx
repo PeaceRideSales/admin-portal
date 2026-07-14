@@ -43,14 +43,14 @@ export default function AuditLogs() {
         <p className="text-slate-500 text-sm">Security and activity history ({total} records)</p>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col overflow-hidden">
+      <div className="clay-card flex flex-col overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-48"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-medium">
+                <thead className="border-b border-slate-300 text-slate-600 font-medium">
                   <tr>
                     <th className="px-6 py-3">Timestamp</th>
                     <th className="px-6 py-3">Admin</th>
@@ -100,7 +100,7 @@ export default function AuditLogs() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between px-6 py-4 border-t border-slate-300 bg-slate-50">
                 <p className="text-sm text-slate-500">
                   Showing <span className="font-medium">{(page - 1) * limit + 1}</span> to <span className="font-medium">{Math.min(page * limit, total)}</span> of <span className="font-medium">{total}</span>
                 </p>
@@ -108,14 +108,14 @@ export default function AuditLogs() {
                   <button 
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-3 py-1 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 text-sm font-medium text-slate-700"
+                    className="px-4 py-2 clay-btn disabled:opacity-50 text-sm font-bold text-slate-700"
                   >
                     Previous
                   </button>
                   <button 
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="px-3 py-1 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50 text-sm font-medium text-slate-700"
+                    className="px-4 py-2 clay-btn disabled:opacity-50 text-sm font-bold text-slate-700"
                   >
                     Next
                   </button>
