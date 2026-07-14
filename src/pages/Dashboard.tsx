@@ -8,6 +8,24 @@ import {
 } from 'recharts'
 import { api } from '../api'
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="clay-card p-4 border border-blue-100/50 dark:border-slate-700/50">
+        {label && <p className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2">{label}</p>}
+        {payload.map((p: any, idx: number) => (
+          <div key={idx} className="text-sm font-bold flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full inline-block shadow-sm" style={{ backgroundColor: p.color || p.fill || '#3b82f6' }}></span>
+            <span className="text-slate-600 dark:text-slate-300">{p.name || 'Value'}:</span>
+            <span className="text-slate-900 dark:text-white">{p.value}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+  return null
+}
+
 export default function Dashboard() {
   const { data, isLoading: loading } = useQuery({
     queryKey: ['dashboard_stats'],
@@ -104,7 +122,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {/* Trend Chart */}
           <div className="clay-card p-5 xl:col-span-2">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
               <div className="w-8 h-8 clay-btn-blue flex items-center justify-center shrink-0">
                 <TrendingUp className="w-4 h-4 text-white" />
               </div>
@@ -125,9 +143,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#c3cce6" strokeOpacity={0.5} />
                   <XAxis dataKey="date" tick={{fontSize: 12, fill: '#64748b', fontWeight: 'bold'}} tickFormatter={(v) => v.substring(5)} tickLine={false} axisLine={false} />
                   <YAxis tick={{fontSize: 12, fill: '#64748b', fontWeight: 'bold'}} tickLine={false} axisLine={false} />
-                  <Tooltip 
-                    contentStyle={{ borderRadius: '24px', backgroundColor: '#eef2ff', border: 'none', boxShadow: '8px 8px 16px #c3cce6, -8px -8px 16px #ffffff', fontWeight: 'bold', color: '#1e293b' }} 
-                  />
+                  <Tooltip content={<CustomTooltip />} />
                   <Area type="monotone" dataKey="count" stroke="#2563eb" strokeWidth={5} fillOpacity={1} fill="url(#colorCount)" style={{ filter: 'url(#clayShadow)' }} />
                 </AreaChart>
               </ResponsiveContainer>
@@ -136,7 +152,7 @@ export default function Dashboard() {
 
           {/* Car Types Chart */}
           <div className="clay-card p-5">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
               <div className="w-8 h-8 clay-btn-indigo flex items-center justify-center shrink-0">
                 <PieChartIcon className="w-4 h-4 text-white" />
               </div>
@@ -165,7 +181,7 @@ export default function Dashboard() {
                       <Cell key={`cell-${index}`} fill={['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f43f5e', '#14b8a6'][index % 8]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ borderRadius: '24px', backgroundColor: '#eef2ff', border: 'none', boxShadow: '8px 8px 16px #c3cce6, -8px -8px 16px #ffffff', fontWeight: 'bold' }} />
+                  <Tooltip content={<CustomTooltip />} />
                   <Legend verticalAlign="bottom" height={36} wrapperStyle={{ fontSize: '12px', fontWeight: 'bold' }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -174,7 +190,7 @@ export default function Dashboard() {
 
           {/* Locations Bar Chart */}
           <div className="clay-card p-5 xl:col-span-3">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
               <div className="w-8 h-8 clay-btn-emerald flex items-center justify-center shrink-0">
                 <BarChart3 className="w-4 h-4 text-white" />
               </div>
@@ -195,7 +211,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#c3cce6" strokeOpacity={0.5} />
                   <XAxis type="number" tick={{fontSize: 12, fill: '#64748b', fontWeight: 'bold'}} tickLine={false} axisLine={false} />
                   <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12, fill: '#64748b', fontWeight: 'bold'}} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: '24px', backgroundColor: '#eef2ff', border: 'none', boxShadow: '8px 8px 16px #c3cce6, -8px -8px 16px #ffffff', fontWeight: 'bold' }} cursor={{fill: '#e0e7ff', opacity: 0.5, radius: 12}} />
+                  <Tooltip content={<CustomTooltip />} cursor={{fill: '#e0e7ff', opacity: 0.5, radius: 12}} />
                   <Bar dataKey="count" fill="url(#colorBar)" radius={[0, 16, 16, 0]} barSize={24} style={{ filter: 'url(#barShadow)' }} />
                 </BarChart>
               </ResponsiveContainer>
