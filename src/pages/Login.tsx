@@ -40,7 +40,7 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8 clay-card-blue p-10">
         <div>
           <div className="mx-auto h-20 w-20 bg-blue-500 rounded-3xl flex items-center justify-center text-white clay-btn-blue">
-            <img src="/logo.png" alt="Peace Ride" className="w-12 h-12 object-contain filter brightness-0 invert" onError={e => (e.currentTarget.style.display = 'none')} />
+            <img src="/logo.png" alt="Peace Ride" className="w-12 h-12 object-contain " onError={e => (e.currentTarget.style.display = 'none')} />
           </div>
           <h2 className="mt-8 text-center text-3xl font-extrabold text-white">
             Admin Portal

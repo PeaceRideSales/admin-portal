@@ -45,7 +45,7 @@ export default function Layout() {
         <div className="h-16 flex items-center justify-between px-5 border-b border-blue-400/30">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-              <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain filter brightness-0 invert" onError={e => (e.currentTarget.style.display = 'none')} />
+              <img src="/logo.png" alt="Peace Ride" className="w-7 h-7 object-contain " onError={e => (e.currentTarget.style.display = 'none')} />
             </div>
             <span className="font-bold text-lg text-white tracking-tight">Peace Ride</span>
           </div>

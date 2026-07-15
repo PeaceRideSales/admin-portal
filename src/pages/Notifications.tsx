@@ -18,6 +18,7 @@ export default function Notifications() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'COMPLETED' | 'FAILED'>('ALL')
+  const [expandedId, setExpandedId] = useState<number | null>(null)
 
   const [isComposeOpen, setIsComposeOpen] = useState(false)
   const [composeType, setComposeType] = useState<'ALL' | 'INDIVIDUAL'>('ALL')
@@ -178,7 +179,9 @@ export default function Notifications() {
               const sc = statusConfig[msg.status] || statusConfig.PENDING
               const Icon = sc.icon
               return (
-                <div key={msg.id} className="p-4 md:px-6 hover:bg-slate-50 transition-colors">
+                <div key={msg.id} 
+                     onClick={() => setExpandedId(expandedId === msg.id ? null : msg.id)}
+                     className="p-4 md:px-6 hover:bg-slate-50 transition-colors cursor-pointer">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${sc.cls}`}>
@@ -188,8 +191,8 @@ export default function Notifications() {
                       <span className="text-xs text-slate-300">•</span>
                       <span className="text-xs text-slate-400">{new Date(msg.created_at).toLocaleString()}</span>
                     </div>
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap break-words leading-relaxed line-clamp-3">{msg.message}</p>
-                    {msg.error && <p className="text-xs text-red-500 mt-1 font-mono truncate">Error: {msg.error}</p>}
+                    <p className={`text-sm text-slate-700 whitespace-pre-wrap break-words leading-relaxed ${expandedId === msg.id ? '' : 'line-clamp-3'}`}>{msg.message}</p>
+                    {msg.error && <p className={`text-xs text-red-500 mt-1 font-mono break-words ${expandedId === msg.id ? '' : 'truncate'}`}>Error: {msg.error}</p>}
                     {msg.processed_at && <p className="text-xs text-slate-400 mt-1">Processed: {new Date(msg.processed_at).toLocaleString()}</p>}
                   </div>
                 </div>
