@@ -54,7 +54,7 @@ function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value
 async function downloadViaProxy(fileUrl: string, docName: string) {
   if (!fileUrl) throw new Error('No valid URL provided for download.')
   const ext = fileUrl.split('.').pop()?.split('?')[0] || 'bin'
-  const safeName = `${docName.replace(/[^a-zA-Z0-9]/g, '_')}.${ext}`
+  const safeName = `${docName.replace(/[^a-zA-Z0-9 \-_]/g, '')}.${ext}`
   const proxyUrl = `${API}/upload/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(safeName)}`
 
   const res = await fetch(proxyUrl, {
