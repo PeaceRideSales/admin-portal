@@ -115,12 +115,30 @@ export default function DriverDetailModal({ driver, onClose, onVerify, onDecline
       const presignedData = await api.post('/upload/document/presigned', { filename: fileName })
       if (!presignedData.signedUrl) throw new Error('Failed to get upload URL')
 
+      let mimeType = file.type;
+      if (!mimeType) {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
+        else if (ext === 'png') mimeType = 'image/png';
+        else if (ext === 'webp') mimeType = 'image/webp';
+        else if (ext === 'pdf') mimeType = 'application/pdf';
+        else mimeType = 'application/octet-stream';
+      }
+
       const uploadRes = await fetch(presignedData.signedUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type },
+        headers: { 'Content-Type': mimeType },
         body: file
       })
-      if (!uploadRes.ok) throw new Error('Failed to upload file')
+      if (!uploadRes.ok) {
+        let msg = 'Failed to upload file';
+        try {
+          const errData = await uploadRes.json();
+          if (errData.message) msg = errData.message;
+          if (errData.error === 'Payload Too Large') msg = 'File is too large. Max size is 20MB.';
+        } catch {}
+        throw new Error(msg);
+      }
 
       const docUrl = presignedData.publicUrl
       await api.patch(`/drivers/${driver.id}/admin-document`, { document_url: docUrl })
